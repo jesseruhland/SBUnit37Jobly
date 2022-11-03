@@ -137,4 +137,30 @@ router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
+/** POST /[username]/jobs/[id] => { user }
+ *
+ * Returns { applied: jobId }
+ *
+ * Authorization required: login by this user or Admin
+ **/
+router.post(
+  "/:username/jobs/:id",
+  ensureLoggedIn,
+  async function (req, res, next) {
+    try {
+      // check if this user is the logged-in user.  If not, ensure logged-in user is an admin.
+      if (
+        res.locals.user.username != req.params.username &&
+        !res.locals.user.isAdmin
+      ) {
+        throw new UnauthorizedError();
+      }
+      const result = await User.apply(req.params.username, req.params.id);
+      return res.status(201).json({ applied: result });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
 module.exports = router;

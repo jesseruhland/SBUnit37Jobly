@@ -140,6 +140,7 @@ describe("get", function () {
       lastName: "U1L",
       email: "u1@email.com",
       isAdmin: false,
+      jobs: [],
     });
   });
 
@@ -214,8 +215,7 @@ describe("update", function () {
 describe("remove", function () {
   test("works", async function () {
     await User.remove("u1");
-    const res = await db.query(
-        "SELECT * FROM users WHERE username='u1'");
+    const res = await db.query("SELECT * FROM users WHERE username='u1'");
     expect(res.rows.length).toEqual(0);
   });
 
@@ -225,6 +225,51 @@ describe("remove", function () {
       fail();
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
+
+/************************************** apply */
+
+describe("apply", function () {
+  test("works", async function () {
+    const job = await db.query(`SELECT id FROM jobs WHERE title = 'CEO'`);
+    const jobId = job.rows[0].id;
+    await User.apply("u1", jobId);
+    const res = await db.query(
+      `SELECT username, job_id FROM applications WHERE username = 'u1'`
+    );
+    expect(res.rows.length).toEqual(1);
+  });
+
+  test("does not work for bad username", async function () {
+    try {
+      const job = await db.query(`SELECT id FROM jobs WHERE title = 'CEO'`);
+      const jobId = job.rows[0].id;
+      await User.apply("notUser", jobId);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("does not work for bad jobId", async function () {
+    try {
+      await User.apply("u1", 0);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("does not work for duplicate application", async function () {
+    try {
+      const job = await db.query(`SELECT id FROM jobs WHERE title = 'CEO'`);
+      const jobId = job.rows[0].id;
+      await User.apply("u2", jobId);
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
     }
   });
 });
