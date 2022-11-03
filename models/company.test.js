@@ -189,6 +189,20 @@ describe("get", function () {
       description: "Desc1",
       numEmployees: 1,
       logoUrl: "http://c1.img",
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: "CEO",
+          salary: 500000,
+          equity: "0.27",
+        },
+        {
+          id: expect.any(Number),
+          title: "Receptionist",
+          salary: 50000,
+          equity: "0",
+        },
+      ],
     });
   });
 

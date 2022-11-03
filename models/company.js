@@ -109,10 +109,34 @@ class Company {
     );
 
     const company = companyRes.rows[0];
-
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
-    return company;
+    const jobRes = await db.query(
+      `SELECT id, title, salary, equity FROM jobs WHERE company_handle = $1`,
+      [handle]
+    );
+
+    const jobs = [];
+    for (let row of jobRes.rows) {
+      const job = {
+        id: row.id,
+        title: row.title,
+        salary: row.salary,
+        equity: row.equity,
+      };
+      jobs.push(job);
+    }
+
+    const result = {
+      handle: company.handle,
+      name: company.name,
+      description: company.description,
+      numEmployees: company.numEmployees,
+      logoUrl: company.logoUrl,
+      jobs: jobs,
+    };
+
+    return result;
   }
 
   /** Update company data with `data`.
