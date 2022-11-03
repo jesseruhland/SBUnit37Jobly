@@ -65,8 +65,9 @@ class Company {
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
+  // written by JR
 
-  static async filtered(filters) {
+  static async findFiltered(filters) {
     const filterStr = createSqlFilterStr(filters);
     const querySql = `SELECT handle,
                   name,

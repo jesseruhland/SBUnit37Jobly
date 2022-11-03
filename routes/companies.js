@@ -49,15 +49,16 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: none
  */
 
+// written by JR to incorporate filtering
 router.get("/", async function (req, res, next) {
   try {
     let companies;
 
-    // check for query filters, if so filter results
+    // check for accepted query filters, if so filter results:
     const { nameLike, minEmployees, maxEmployees } = req.query;
     if (nameLike || minEmployees || maxEmployees) {
       const filters = { nameLike, minEmployees, maxEmployees };
-      companies = await Company.filtered(filters);
+      companies = await Company.findFiltered(filters);
     }
 
     // if no query filters are provided:

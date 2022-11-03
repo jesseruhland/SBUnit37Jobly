@@ -1,7 +1,9 @@
-const { sqlForPartialUpdate } = require("./sql");
+const { sqlForPartialUpdate, createSqlFilterStr } = require("./sql");
 
-describe("create object with SQL components to make updates to the database", function () {
-  test("works when provided the correct arguments", function () {
+/************************************** sqlForPartialUpdate */
+// written by JR
+describe("sqlForPartialUpdate", function () {
+  test("works: when provided the correct arguments", function () {
     const output = sqlForPartialUpdate(
       { firstName: "newUser" },
       {
@@ -16,7 +18,7 @@ describe("create object with SQL components to make updates to the database", fu
     });
   });
 
-  test("throws error when not provided object with keys as first argument", function () {
+  test("throws: when not provided object with keys as first argument", function () {
     expect(() => {
       sqlForPartialUpdate(
         {},
@@ -27,5 +29,50 @@ describe("create object with SQL components to make updates to the database", fu
         }
       );
     }).toThrow();
+  });
+});
+
+/************************************** createSqlFilterStr */
+// written by JR
+describe("createSqlFilterStr", function () {
+  test("works: when provided correct arguments", function () {
+    const output = createSqlFilterStr({
+      nameLike: "c",
+      minEmployees: 2,
+      maxEmployees: 2,
+    });
+    expect(output).toEqual(
+      "name ILIKE '%c%' AND num_employees >= 2 AND num_employees <= 2"
+    );
+  });
+
+  test("throws: when provided min larger than max", function () {
+    expect(() => {
+      createSqlFilterStr({
+        nameLike: "c",
+        minEmployees: 3,
+        maxEmployees: 2,
+      });
+    }).toThrow;
+  });
+
+  test("throws: when min is not an integer", function () {
+    expect(() => {
+      createSqlFilterStr({
+        nameLike: "c",
+        minEmployees: few,
+        maxEmployees: 2,
+      });
+    }).toThrow;
+  });
+
+  test("throws: when max is not an integer", function () {
+    expect(() => {
+      createSqlFilterStr({
+        nameLike: "c",
+        minEmployees: 2,
+        maxEmployees: three,
+      });
+    }).toThrow;
   });
 });
