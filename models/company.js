@@ -6,7 +6,10 @@ const {
   NotFoundError,
   ExpressError,
 } = require("../expressError");
-const { sqlForPartialUpdate, createSqlFilterStr } = require("../helpers/sql");
+const {
+  sqlForPartialUpdate,
+  createSqlFilterStrComp,
+} = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -68,7 +71,7 @@ class Company {
   // written by JR
 
   static async findFiltered(filters) {
-    const filterStr = createSqlFilterStr(filters);
+    const filterStr = createSqlFilterStrComp(filters);
     const querySql = `SELECT handle,
                   name,
                   description,

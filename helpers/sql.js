@@ -42,12 +42,12 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
  *  Expects 'filters' argument to be an object containing 'nameLike', 'minEmployees', and/or 'maxEmployees'
  ********
  *  Example:
- *  input => createSqlFilterStr({nameLike: "ne", minEmployees: "10", maxEmployees:"200"})
+ *  input => createSqlFilterStrComp({nameLike: "ne", minEmployees: "10", maxEmployees:"200"})
  *  output => "name ILIKE '%ne%' AND num_employees >= 10 AND num_employees <= 200"
  ********
  *  Checks input filters for bad input (min/maxEmployees must be passed a number, min cannot be larger than max)
  */
-function createSqlFilterStr(filters) {
+function createSqlFilterStrComp(filters) {
   const name = filters.nameLike;
   const minEmployees = parseInt(filters.minEmployees);
   const maxEmployees = parseInt(filters.maxEmployees);
@@ -79,4 +79,29 @@ function createSqlFilterStr(filters) {
   return filterStr;
 }
 
-module.exports = { sqlForPartialUpdate, createSqlFilterStr };
+function createSqlFilterStrJobs(filters) {
+  const title = filters.title;
+  const minSalary = parseInt(filters.minSalary);
+  const hasEquity = filters.hasEquity;
+  if (filters.minSalary && !minSalary) {
+    throw new BadRequestError("minSalary must be an integer", 400);
+  }
+  const filterList = [];
+  if (title) {
+    filterList.push(`title ILIKE '%${title}%'`);
+  }
+  if (minSalary) {
+    filterList.push(`salary >= ${minSalary}`);
+  }
+  if (hasEquity) {
+    filterList.push(`equity > 0`);
+  }
+  const filterStr = filterList.join(" AND ");
+  return filterStr;
+}
+
+module.exports = {
+  sqlForPartialUpdate,
+  createSqlFilterStrComp,
+  createSqlFilterStrJobs,
+};

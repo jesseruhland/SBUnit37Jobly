@@ -1,4 +1,4 @@
-const { sqlForPartialUpdate, createSqlFilterStr } = require("./sql");
+const { sqlForPartialUpdate, createSqlFilterStrComp } = require("./sql");
 
 /************************************** sqlForPartialUpdate */
 // written by JR
@@ -32,11 +32,11 @@ describe("sqlForPartialUpdate", function () {
   });
 });
 
-/************************************** createSqlFilterStr */
+/************************************** createSqlFilterStrComp */
 // written by JR
-describe("createSqlFilterStr", function () {
+describe("createSqlFilterStrComp", function () {
   test("works: when provided correct arguments", function () {
-    const output = createSqlFilterStr({
+    const output = createSqlFilterStrComp({
       nameLike: "c",
       minEmployees: 2,
       maxEmployees: 2,
@@ -48,7 +48,7 @@ describe("createSqlFilterStr", function () {
 
   test("throws: when provided min larger than max", function () {
     expect(() => {
-      createSqlFilterStr({
+      createSqlFilterStrComp({
         nameLike: "c",
         minEmployees: 3,
         maxEmployees: 2,
@@ -58,7 +58,7 @@ describe("createSqlFilterStr", function () {
 
   test("throws: when min is not an integer", function () {
     expect(() => {
-      createSqlFilterStr({
+      createSqlFilterStrComp({
         nameLike: "c",
         minEmployees: few,
         maxEmployees: 2,
@@ -68,7 +68,7 @@ describe("createSqlFilterStr", function () {
 
   test("throws: when max is not an integer", function () {
     expect(() => {
-      createSqlFilterStr({
+      createSqlFilterStrComp({
         nameLike: "c",
         minEmployees: 2,
         maxEmployees: three,
