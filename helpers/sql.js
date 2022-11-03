@@ -38,4 +38,45 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-module.exports = { sqlForPartialUpdate };
+/*  This is a helper function create the SQL string for filtering company results.
+ *  Expects 'filters' argument to be an object containing 'nameLike', 'minEmployees', and/or 'maxEmployees'
+ ********
+ *  Example:
+ *  input => createSqlFilterStr({nameLike: "ne", minEmployees: "10", maxEmployees:"200"})
+ *  output => "name ILIKE '%ne%' AND num_employees >= 10 AND num_employees <= 200"
+ ********
+ *  Checks input filters for bad input (min/maxEmployees must be passed a number, min cannot be larger than max)
+ */
+function createSqlFilterStr(filters) {
+  const name = filters.nameLike;
+  const minEmployees = parseInt(filters.minEmployees);
+  const maxEmployees = parseInt(filters.maxEmployees);
+  if (filters.minEmployees && !minEmployees) {
+    throw new BadRequestError("minEmployees must be an integer", 400);
+  }
+  if (filters.maxEmployees && !maxEmployees) {
+    throw new BadRequestError("maxEmployees must be an integer", 400);
+  }
+  if (minEmployees && maxEmployees) {
+    if (minEmployees > maxEmployees) {
+      throw new BadRequestError(
+        "minEmployees cannot be larger than maxEmployees",
+        400
+      );
+    }
+  }
+  const filterList = [];
+  if (name) {
+    filterList.push(`name ILIKE '%${name}%'`);
+  }
+  if (minEmployees) {
+    filterList.push(`num_employees >= ${minEmployees}`);
+  }
+  if (maxEmployees) {
+    filterList.push(`num_employees <= ${maxEmployees}`);
+  }
+  const filterStr = filterList.join(" AND ");
+  return filterStr;
+}
+
+module.exports = { sqlForPartialUpdate, createSqlFilterStr };
